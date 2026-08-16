@@ -11,50 +11,50 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💧</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col justify-between">
 
   <!-- HEADER -->
   <header class="bg-blue-800 text-white shadow-lg">
     <div class="container mx-auto px-4 py-4 text-center">
-      <div class="flex justify-center items-center gap-3 mb-2">
+      <div class="flex justify-center items-center gap-3 mb-1">
         <span class="text-3xl">💧</span>
-        <h1 class="text-2xl font-bold">Joy Water Supplies</h1>
+        <h1 class="text-2xl font-bold tracking-tight">Joy Water Supplies</h1>
       </div>
       <p class="text-xs text-blue-200">Customer Self-Service Portal</p>
     </div>
   </header>
 
-  <main class="container mx-auto px-4 py-6 max-w-2xl">
+  <main class="container mx-auto px-4 py-6 max-w-2xl flex-grow">
 
     <!-- LOGIN SECTION -->
-    <div id="loginSection" class="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
+    <div id="loginSection" class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-md mx-auto">
       <div class="text-center mb-6">
         <div class="inline-block bg-blue-50 p-4 rounded-full mb-3">
           <span class="text-4xl">🔓</span>
         </div>
         <h2 class="text-2xl font-bold text-gray-800">Login to Your Account</h2>
-        <p class="text-xs text-gray-500 mt-2">View your water bill and account details</p>
+        <p class="text-xs text-gray-500 mt-1">View your water bill, payment history, and usage</p>
       </div>
 
       <div id="loginMessage" class="mb-4"></div>
 
       <form onsubmit="handleLogin(event)" class="space-y-4">
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Phone Number <span class="text-xs text-gray-500">(+254 or 0)</span>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">
+            Phone Number <span class="text-xs text-gray-500 font-normal">(+254 or 07...)</span>
           </label>
           <input type="tel" id="loginPhone" placeholder="+254700000001 or 0700000001" required
-            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Meter Number</label>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Meter Number</label>
           <input type="text" id="loginMeter" placeholder="e.g., M-00123" required
-            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none transition uppercase">
         </div>
 
-        <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition">
-          🔓 Login to Account
+        <button type="submit" id="loginBtn" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg shadow transition duration-200 flex items-center justify-center gap-2">
+          <span>🔓</span> <span>Login to Account</span>
         </button>
       </form>
     </div>
@@ -66,78 +66,82 @@
       <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white rounded-2xl shadow-xl p-6">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs text-blue-200 uppercase font-semibold">Welcome</p>
+            <p class="text-xs text-blue-200 uppercase font-semibold tracking-wider">Welcome</p>
             <h2 id="customerName" class="text-2xl font-bold mt-1">Loading...</h2>
-            <p id="customerMeter" class="text-sm text-blue-200 mt-2">Meter: M-00000</p>
+            <p id="customerMeter" class="text-sm text-blue-200 mt-1">Meter: M-00000</p>
           </div>
-          <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg font-bold text-sm transition">
+          <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg font-bold text-xs shadow transition flex items-center gap-1">
             🚪 Logout
           </button>
         </div>
       </div>
 
       <!-- ACCOUNT SUMMARY -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
-          <p class="text-xs text-gray-600 font-semibold">Account ID</p>
-          <p id="customerId" class="text-lg font-bold text-gray-800 mt-2">CUST-0000</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500">
+          <p class="text-xs text-gray-500 font-semibold uppercase">Account ID</p>
+          <p id="customerId" class="text-base font-bold text-gray-800 mt-1">CUST-0000</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
-          <p class="text-xs text-gray-600 font-semibold">Account Type</p>
-          <p id="customerType" class="text-lg font-bold text-gray-800 mt-2">Apartment Tenant</p>
+        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500">
+          <p class="text-xs text-gray-500 font-semibold uppercase">Account Type</p>
+          <p id="customerType" class="text-base font-bold text-gray-800 mt-1">Tenant</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
-          <p class="text-xs text-gray-600 font-semibold">Account Status</p>
-          <p id="customerStatus" class="text-lg font-bold text-green-600 mt-2">✅ Active</p>
+        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-green-500">
+          <p class="text-xs text-gray-500 font-semibold uppercase">Status</p>
+          <p id="customerStatus" class="text-base font-bold text-green-600 mt-1">✅ Active</p>
         </div>
       </div>
 
-      <!-- TABS -->
-      <div class="flex gap-2 bg-gray-200 p-2 rounded-xl overflow-x-auto">
-        <button onclick="switchTab('invoices')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg bg-white text-blue-700 font-bold text-sm whitespace-nowrap transition">
+      <!-- NAVIGATION TABS -->
+      <div class="flex gap-2 bg-gray-200 p-1.5 rounded-xl overflow-x-auto">
+        <button onclick="switchTab('invoices')" id="tabBtn-invoices" class="tab-btn flex-1 py-2.5 px-4 rounded-lg bg-white text-blue-700 font-bold text-sm shadow-sm whitespace-nowrap transition">
           📋 Invoices
         </button>
-        <button onclick="switchTab('payments')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
+        <button onclick="switchTab('payments')" id="tabBtn-payments" class="tab-btn flex-1 py-2.5 px-4 rounded-lg text-gray-600 font-bold text-sm hover:text-gray-900 whitespace-nowrap transition">
           💳 Payments
         </button>
-        <button onclick="switchTab('trends')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
+        <button onclick="switchTab('trends')" id="tabBtn-trends" class="tab-btn flex-1 py-2.5 px-4 rounded-lg text-gray-600 font-bold text-sm hover:text-gray-900 whitespace-nowrap transition">
           📈 Trends
         </button>
       </div>
 
-      <!-- TAB CONTENTS -->
-      <div class="bg-white rounded-2xl shadow-lg p-6">
+      <!-- TAB CONTENTS CONTAINER -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
 
         <!-- INVOICES TAB -->
         <div id="invoicesTab" class="tab-content">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">📋 Recent Invoices</h3>
-          <button onclick="loadInvoices()" class="mb-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
-            🔄 Refresh
-          </button>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-gray-800">📋 Recent Invoices</h3>
+            <button onclick="loadInvoices()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-semibold text-xs transition flex items-center gap-1">
+              🔄 Refresh
+            </button>
+          </div>
           <div class="space-y-3" id="invoicesList">
-            <p class="text-center text-gray-500">Loading invoices...</p>
+            <p class="text-center text-gray-500 py-6">Loading invoices...</p>
           </div>
         </div>
 
         <!-- PAYMENTS TAB -->
         <div id="paymentsTab" class="tab-content hidden">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">💳 Payment History</h3>
-          <button onclick="loadPayments()" class="mb-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
-            🔄 Refresh
-          </button>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-gray-800">💳 Payment History</h3>
+            <button onclick="loadPayments()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-semibold text-xs transition flex items-center gap-1">
+              🔄 Refresh
+            </button>
+          </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-100 border-b">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-gray-50 text-gray-600 uppercase text-xs border-b">
                 <tr>
-                  <th class="p-3 text-left font-bold">Date</th>
-                  <th class="p-3 text-left font-bold">Amount</th>
-                  <th class="p-3 text-left font-bold">Method</th>
-                  <th class="p-3 text-left font-bold">Status</th>
+                  <th class="p-3 font-semibold">Date</th>
+                  <th class="p-3 font-semibold">Amount</th>
+                  <th class="p-3 font-semibold">Method</th>
+                  <th class="p-3 font-semibold">Status</th>
                 </tr>
               </thead>
-              <tbody id="paymentsBody" class="divide-y">
+              <tbody id="paymentsBody" class="divide-y text-gray-700">
                 <tr>
-                  <td colspan="4" class="p-4 text-center text-gray-500">Loading payments...</td>
+                  <td colspan="4" class="p-6 text-center text-gray-500">Loading payments...</td>
                 </tr>
               </tbody>
             </table>
@@ -146,22 +150,24 @@
 
         <!-- TRENDS TAB -->
         <div id="trendsTab" class="tab-content hidden">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Consumption Trends</h3>
-          <button onclick="loadTrends()" class="mb-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
-            🔄 Refresh
-          </button>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-gray-800">📈 Consumption Trends</h3>
+            <button onclick="loadTrends()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-semibold text-xs transition flex items-center gap-1">
+              🔄 Refresh
+            </button>
+          </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-100 border-b">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-gray-50 text-gray-600 uppercase text-xs border-b">
                 <tr>
-                  <th class="p-3 text-left font-bold">Month</th>
-                  <th class="p-3 text-right font-bold">Consumption</th>
-                  <th class="p-3 text-right font-bold">Amount</th>
+                  <th class="p-3 font-semibold">Month</th>
+                  <th class="p-3 font-semibold text-right">Units Used</th>
+                  <th class="p-3 font-semibold text-right">Amount</th>
                 </tr>
               </thead>
-              <tbody id="trendsBody" class="divide-y">
+              <tbody id="trendsBody" class="divide-y text-gray-700">
                 <tr>
-                  <td colspan="3" class="p-4 text-center text-gray-500">Loading trends...</td>
+                  <td colspan="3" class="p-6 text-center text-gray-500">Loading trends...</td>
                 </tr>
               </tbody>
             </table>
@@ -170,15 +176,17 @@
 
       </div>
 
-      <!-- HELP SECTION -->
-      <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
-        <h3 class="font-bold text-gray-800 mb-3">❓ Need Help?</h3>
-        <p class="text-sm text-gray-700 mb-3">For billing inquiries or to pay your bill, contact us:</p>
-        <div class="space-y-2 text-sm">
-          <p><strong>Phone:</strong> +254768789382</p>
-          <p><strong>WhatsApp:</strong> <a href="https://wa.me/254768789382" target="_blank" class="text-blue-600 hover:underline">Chat with us</a></p>
-          <p><strong>Email:</strong> joywatersupplies@gmail.com</p>
-          <p><strong>Payment Till:</strong> 4984254 (M-Pesa)</p>
+      <!-- HELP & SUPPORT SECTION -->
+      <div class="bg-blue-50 rounded-2xl p-5 border border-blue-200">
+        <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+          <span>❓</span> Need Help or Support?
+        </h3>
+        <p class="text-xs text-gray-600 mb-3">For billing inquiries or top-up payments, reach us directly:</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-700">
+          <p><strong>📞 Phone:</strong> +254768789382</p>
+          <p><strong>💬 WhatsApp:</strong> <a href="https://wa.me/254768789382" target="_blank" class="text-blue-600 underline hover:text-blue-800">Chat with us</a></p>
+          <p><strong>✉️ Email:</strong> joywatersupplies@gmail.com</p>
+          <p><strong>💚 M-Pesa Till:</strong> <span class="font-bold text-green-700">4984254</span></p>
         </div>
       </div>
 
@@ -187,33 +195,34 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="bg-gray-800 text-gray-300 text-center py-4 mt-8 text-xs">
-    &copy; 2026 Joy Water Supplies | Powered by MajiHesabu
+  <footer class="bg-gray-800 text-gray-400 text-center py-4 text-xs mt-8">
+    &copy; 2026 Joy Water Supplies | Powered by MajiHesabu™
   </footer>
 
+  <!-- APPLICATION LOGIC -->
   <script>
-    // ✅ API URL from config.js
     const SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) 
       ? CONFIG.API_ENDPOINT 
       : null;
 
     let currentCustomer = null;
 
-    console.log("✅ Customer Portal Loaded");
-    console.log("API Endpoint:", SCRIPT_URL);
-
-    // LOGIN HANDLER
+    // LOGIN FUNCTION
     async function handleLogin(event) {
       event.preventDefault();
       const phone = document.getElementById('loginPhone').value.trim();
       const meterNumber = document.getElementById('loginMeter').value.trim();
+      const loginBtn = document.getElementById('loginBtn');
 
       if (!SCRIPT_URL) {
-        showLoginMessage("❌ API not configured", true);
+        showLoginMessage("❌ API endpoint not configured in config.js", true);
         return;
       }
 
       try {
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = `<span>⏳</span> <span>Authenticating...</span>`;
+
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -225,7 +234,7 @@
         });
 
         const text = await response.text();
-        if (text.startsWith('<')) throw new Error("Server error");
+        if (text.startsWith('<')) throw new Error("Server response error. Please try again.");
 
         const result = JSON.parse(text);
 
@@ -239,13 +248,16 @@
         }
       } catch (err) {
         showLoginMessage("❌ " + err.message, true);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = `<span>🔓</span> <span>Login to Account</span>`;
       }
     }
 
     function showLoginMessage(msg, isError) {
       const el = document.getElementById('loginMessage');
-      el.innerHTML = `<div class="p-3 rounded-lg text-sm font-bold ${
-        isError ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-green-100 text-green-700 border border-green-300'
+      el.innerHTML = `<div class="p-3 rounded-lg text-xs font-bold ${
+        isError ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-green-100 text-green-700 border border-green-200'
       }">${msg}</div>`;
     }
 
@@ -256,12 +268,15 @@
       document.getElementById('customerId').innerText = currentCustomer.customerId || 'CUST-0000';
       document.getElementById('customerName').innerText = currentCustomer.name || 'Customer';
       document.getElementById('customerMeter').innerText = 'Meter: ' + (currentCustomer.meterNumber || 'M-0000');
-      document.getElementById('customerType').innerText = currentCustomer.type || 'Apartment Tenant';
+      document.getElementById('customerType').innerText = currentCustomer.type || 'Tenant';
       document.getElementById('customerStatus').innerText = '✅ ' + (currentCustomer.status || 'Active');
     }
 
-    // LOAD INVOICES
+    // FETCH INVOICES
     async function loadInvoices() {
+      const listEl = document.getElementById('invoicesList');
+      listEl.innerHTML = '<p class="text-center text-gray-500 py-4 text-xs">Loading invoices...</p>';
+
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -273,23 +288,22 @@
         });
 
         const text = await response.text();
-        if (text.startsWith('<')) throw new Error("Server error");
+        if (text.startsWith('<')) throw new Error("Server error fetching invoices");
 
         const data = JSON.parse(text);
-        const listEl = document.getElementById('invoicesList');
 
         if (data.success && data.invoices && data.invoices.length > 0) {
           listEl.innerHTML = data.invoices.map(inv => {
             const isPaid = inv.status && inv.status.toUpperCase() === 'PAID';
             const amount = Number(inv.totalAmount || 0);
             return `
-              <div class="p-4 border rounded-lg hover:shadow-md transition ${isPaid ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}">
-                <div class="flex justify-between items-start">
+              <div class="p-4 border rounded-xl hover:shadow-sm transition ${isPaid ? 'bg-green-50/50 border-green-200' : 'bg-red-50/50 border-red-200'}">
+                <div class="flex justify-between items-center">
                   <div>
-                    <p class="font-bold text-gray-800">${inv.month || inv.date || 'Invoice'}</p>
-                    <p class="text-xs text-gray-600 mt-1">Amount: <span class="font-bold">KES ${amount.toLocaleString()}</span></p>
+                    <p class="font-bold text-gray-800 text-sm">${inv.month || inv.date || 'Invoice'}</p>
+                    <p class="text-xs text-gray-600 mt-1">Amount: <span class="font-bold text-gray-900">KES ${amount.toLocaleString()}</span></p>
                   </div>
-                  <span class="px-2 py-1 rounded text-xs font-bold ${isPaid ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}">
+                  <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isPaid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
                     ${inv.status || 'UNPAID'}
                   </span>
                 </div>
@@ -297,16 +311,19 @@
             `;
           }).join('');
         } else {
-          listEl.innerHTML = '<p class="text-center text-gray-500">No invoices found</p>';
+          listEl.innerHTML = '<p class="text-center text-gray-500 py-4 text-xs">No invoices found for this account.</p>';
         }
       } catch (err) {
         console.error("Invoices error:", err);
-        document.getElementById('invoicesList').innerHTML = '<p class="text-center text-red-500">Error loading invoices</p>';
+        listEl.innerHTML = '<p class="text-center text-red-500 py-4 text-xs">Error loading invoices. Please retry.</p>';
       }
     }
 
-    // LOAD PAYMENTS
+    // FETCH PAYMENTS
     async function loadPayments() {
+      const tbody = document.getElementById('paymentsBody');
+      tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-gray-500 text-xs">Loading payments...</td></tr>';
+
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -318,10 +335,9 @@
         });
 
         const text = await response.text();
-        if (text.startsWith('<')) throw new Error("Server error");
+        if (text.startsWith('<')) throw new Error("Server error fetching payments");
 
         const data = JSON.parse(text);
-        const tbody = document.getElementById('paymentsBody');
 
         if (data.success && data.payments && data.payments.length > 0) {
           tbody.innerHTML = data.payments.map(pay => `
@@ -329,19 +345,23 @@
               <td class="p-3">${pay.date || 'N/A'}</td>
               <td class="p-3 font-bold text-green-600">KES ${Number(pay.amount || 0).toLocaleString()}</td>
               <td class="p-3">${pay.method || 'M-Pesa'}</td>
-              <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-800">${pay.status || 'Posted'}</span></td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold bg-green-100 text-green-800">${pay.status || 'Posted'}</span></td>
             </tr>
           `).join('');
         } else {
-          tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No payments found</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-gray-500 text-xs">No payment records found.</td></tr>';
         }
       } catch (err) {
         console.error("Payments error:", err);
+        tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-red-500 text-xs">Error loading payment history.</td></tr>';
       }
     }
 
-    // LOAD TRENDS
+    // FETCH TRENDS
     async function loadTrends() {
+      const tbody = document.getElementById('trendsBody');
+      tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-gray-500 text-xs">Loading consumption trends...</td></tr>';
+
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -354,41 +374,45 @@
         });
 
         const text = await response.text();
-        if (text.startsWith('<')) throw new Error("Server error");
+        if (text.startsWith('<')) throw new Error("Server error fetching trends");
 
         const data = JSON.parse(text);
-        const tbody = document.getElementById('trendsBody');
 
         if (data.success && data.trends && data.trends.length > 0) {
           tbody.innerHTML = data.trends.map(trend => `
             <tr class="hover:bg-gray-50">
-              <td class="p-3">${trend.month || 'N/A'}</td>
+              <td class="p-3 font-medium">${trend.month || 'N/A'}</td>
               <td class="p-3 text-right font-bold text-blue-600">${trend.consumption || 0} units</td>
-              <td class="p-3 text-right font-bold">KES ${Number(trend.amount || 0).toLocaleString()}</td>
+              <td class="p-3 text-right font-bold text-gray-800">KES ${Number(trend.amount || 0).toLocaleString()}</td>
             </tr>
           `).join('');
         } else {
-          tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No trends found</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-gray-500 text-xs">No trend records available.</td></tr>';
         }
       } catch (err) {
         console.error("Trends error:", err);
+        tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-red-500 text-xs">Error loading trends.</td></tr>';
       }
     }
 
-    // UTILITIES
+    // TAB SWITCHING LOGIC
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-white', 'text-blue-700');
+        btn.classList.remove('bg-white', 'text-blue-700', 'shadow-sm');
+        btn.classList.add('text-gray-600');
       });
 
       document.getElementById(tabName + 'Tab').classList.remove('hidden');
-      event.target.classList.add('bg-white', 'text-blue-700');
+      const activeBtn = document.getElementById('tabBtn-' + tabName);
+      activeBtn.classList.add('bg-white', 'text-blue-700', 'shadow-sm');
+      activeBtn.classList.remove('text-gray-600');
 
       if (tabName === 'payments') loadPayments();
       if (tabName === 'trends') loadTrends();
     }
 
+    // LOGOUT HANDLER
     function logout() {
       currentCustomer = null;
       localStorage.removeItem("majihesabu_customer");
@@ -396,9 +420,10 @@
       document.getElementById('dashboardSection').classList.add('hidden');
       document.getElementById('loginPhone').value = '';
       document.getElementById('loginMeter').value = '';
+      document.getElementById('loginMessage').innerHTML = '';
     }
 
-    // CHECK SAVED SESSION
+    // RESTORE SESSION ON LOAD
     window.addEventListener('DOMContentLoaded', () => {
       const saved = localStorage.getItem("majihesabu_customer");
       if (saved) {
@@ -412,6 +437,5 @@
       }
     });
   </script>
-
 </body>
 </html>
