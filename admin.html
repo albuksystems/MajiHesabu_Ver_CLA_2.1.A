@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joy Water Supplies - Admin Portal</title>
+  
+  <!-- ✅ CRITICAL: config.js MUST load FIRST -->
+  <script src="config.js"></script>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💧</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+  <!-- HEADER -->
+  <header class="bg-blue-800 text-white shadow-lg">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">💧</span>
+        <div>
+          <h1 class="text-2xl font-bold">Joy Water Supplies</h1>
+          <p class="text-xs text-blue-200">Admin Management System</p>
+        </div>
+      </div>
+      <button id="logoutBtn" onclick="logout()" class="hidden bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-bold text-sm transition">
+        🚪 Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container mx-auto px-4 py-6 max-w-5xl">
+
+    <!-- LOGIN SECTION -->
+    <div id="loginSection" class="fade-in">
+      <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
+        <div class="text-center mb-6">
+          <div class="inline-block bg-blue-50 p-4 rounded-full mb-3">
+            <span class="text-4xl">🔐</span>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800">Admin Login</h2>
+          <p class="text-xs text-gray-500 mt-2">Enter your admin credentials to access the system</p>
+        </div>
+
+        <div id="loginMessage" class="mb-4"></div>
+
+        <form onsubmit="handleLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Admin Phone / Username</label>
+            <input type="tel" id="loginPhone" placeholder="0712345678" required
+              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Admin Passcode</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" required
+              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+          </div>
+
+          <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition">
+            🔓 Login to Admin Portal
+          </button>
+        </form>
+
+        <div class="mt-4 p-3 bg-blue-50 rounded-lg text-xs text-blue-700 border border-blue-200">
+          <strong>Demo Credentials:</strong><br>
+          Phone: 0712345678<br>
+          Passcode: MajiAdmin2026
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD SECTION -->
+    <div id="dashboardSection" class="hidden fade-in space-y-6">
+
+      <!-- WELCOME CARD -->
+      <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white rounded-2xl shadow-xl p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs text-blue-200 uppercase font-semibold">Welcome Back</p>
+            <h2 id="adminName" class="text-2xl font-bold mt-1">Admin Dashboard</h2>
+          </div>
+          <span class="bg-blue-500/40 text-blue-100 text-xs font-bold px-3 py-1 rounded-full border border-blue-400/50">
+            Administrator
+          </span>
+        </div>
+      </div>
+
+      <!-- STATS CARDS -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
+          <p class="text-xs text-gray-600 font-semibold">Total Revenue</p>
+          <p class="text-2xl font-bold text-gray-800 mt-2">KES <span id="totalRevenue">0</span></p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
+          <p class="text-xs text-gray-600 font-semibold">Amount Collected</p>
+          <p class="text-2xl font-bold text-gray-800 mt-2">KES <span id="totalCollected">0</span></p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-red-500">
+          <p class="text-xs text-gray-600 font-semibold">Outstanding Balance</p>
+          <p class="text-2xl font-bold text-gray-800 mt-2">KES <span id="totalOutstanding">0</span></p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-orange-500">
+          <p class="text-xs text-gray-600 font-semibold">Collection Rate</p>
+          <p class="text-2xl font-bold text-gray-800 mt-2"><span id="collectionRate">0</span>%</p>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="flex gap-2 bg-gray-200 p-2 rounded-xl overflow-x-auto">
+        <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg bg-white text-blue-700 font-bold text-sm whitespace-nowrap transition">
+          📊 Dashboard
+        </button>
+        <button onclick="switchTab('addCustomer')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
+          ➕ Add Customer
+        </button>
+        <button onclick="switchTab('meterReading')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
+          📏 Meter Reading
+        </button>
+        <button onclick="switchTab('debtors')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
+          💳 Debtors
+        </button>
+        <button onclick="switchTab('customers')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
+          👥 Customers
+        </button>
+      </div>
+
+      <!-- TAB CONTENTS -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+
+        <!-- DASHBOARD TAB -->
+        <div id="dashboardTab" class="tab-content">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">📊 System Overview</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+              <p class="text-sm font-semibold text-blue-900 mb-3">Revenue Summary</p>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span>Total Invoiced:</span> <span class="font-bold" id="dashRevenue">0</span></div>
+                <div class="flex justify-between"><span>Collected:</span> <span class="font-bold text-green-600" id="dashCollected">0</span></div>
+                <div class="flex justify-between"><span>Outstanding:</span> <span class="font-bold text-red-600" id="dashOutstanding">0</span></div>
+              </div>
+            </div>
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+              <p class="text-sm font-semibold text-green-900 mb-3">Collection Performance</p>
+              <div id="collectionChart" class="text-center text-3xl font-bold text-green-600" style="line-height: 100px;">
+                <span id="dashRate">0</span>%
+              </div>
+            </div>
+          </div>
+          <button onclick="loadDashboard()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
+            🔄 Refresh Dashboard
+          </button>
+        </div>
+
+        <!-- ADD CUSTOMER TAB -->
+        <div id="addCustomerTab" class="tab-content hidden">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">➕ Register New Customer</h3>
+          <div id="addCustomerMessage" class="mb-4"></div>
+          <form onsubmit="handleAddCustomer(event)" class="space-y-4 max-w-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
+                <input type="tel" id="custPhone" placeholder="+254700000001 or 0700000001" required
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
+                <input type="text" id="custName" placeholder="Customer name" required
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Customer Type *</label>
+                <select id="custType" required
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+                  <option value="">Select type</option>
+                  <option value="Salty Water Vendor">Salty Water Vendor</option>
+                  <option value="Apartment Tenant">Apartment Tenant</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Meter Number *</label>
+                <input type="text" id="custMeter" placeholder="e.g., M-00123" required
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+              <input type="text" id="custLocation" placeholder="Physical location"
+                class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+              <input type="email" id="custEmail" placeholder="customer@email.com"
+                class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+
+            <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition">
+              ➕ Create Customer
+            </button>
+          </form>
+        </div>
+
+        <!-- METER READING TAB -->
+        <div id="meterReadingTab" class="tab-content hidden">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">📏 Record Meter Reading</h3>
+          <div id="meterReadingMessage" class="mb-4"></div>
+          <form onsubmit="handleMeterReading(event)" class="space-y-4 max-w-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Customer ID *</label>
+                <input type="text" id="meterCustomerId" placeholder="CUST-1234" required
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Meter Number *</label>
+                <input type="text" id="meterNumber" placeholder="M-00123" required
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Current Reading *</label>
+                <input type="number" id="meterReading" placeholder="1234.5" step="0.1" required
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Recorded By *</label>
+                <input type="text" id="recordedBy" placeholder="Your name" required
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+              </div>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition">
+              📏 Record Reading & Generate Invoice
+            </button>
+          </form>
+        </div>
+
+        <!-- DEBTORS TAB -->
+        <div id="debtorsTab" class="tab-content hidden">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">💳 Aged Debtors Report</h3>
+          <button onclick="loadDebtors()" class="mb-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
+            🔄 Refresh Debtors
+          </button>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-100 border-b">
+                <tr>
+                  <th class="p-3 text-left font-bold">Customer Name</th>
+                  <th class="p-3 text-left font-bold">Phone</th>
+                  <th class="p-3 text-left font-bold">Invoice</th>
+                  <th class="p-3 text-right font-bold">Amount Due</th>
+                  <th class="p-3 text-center font-bold">Days Overdue</th>
+                  <th class="p-3 text-center font-bold">Status</th>
+                </tr>
+              </thead>
+              <tbody id="debtorsBody" class="divide-y">
+                <tr>
+                  <td colspan="6" class="p-4 text-center text-gray-500">Loading debtors...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CUSTOMERS TAB -->
+        <div id="customersTab" class="tab-content hidden">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">👥 All Customers</h3>
+          <button onclick="loadCustomers()" class="mb-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
+            🔄 Refresh Customers
+          </button>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-100 border-b">
+                <tr>
+                  <th class="p-3 text-left font-bold">ID</th>
+                  <th class="p-3 text-left font-bold">Name</th>
+                  <th class="p-3 text-left font-bold">Phone</th>
+                  <th class="p-3 text-left font-bold">Meter</th>
+                  <th class="p-3 text-left font-bold">Type</th>
+                  <th class="p-3 text-center font-bold">Status</th>
+                </tr>
+              </thead>
+              <tbody id="customersBody" class="divide-y">
+                <tr>
+                  <td colspan="6" class="p-4 text-center text-gray-500">Loading customers...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-800 text-gray-300 text-center py-4 mt-8 text-xs">
+    &copy; 2026 Joy Water Supplies | Powered by MajiHesabu | Albuk Technologies Ltd
+  </footer>
+
+  <script>
+    // ✅ API URL from config.js
+    const SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) 
+      ? CONFIG.API_ENDPOINT 
+      : null;
+
+    let currentAdmin = null;
+
+    console.log("✅ Admin Portal Loaded");
+    console.log("API Endpoint:", SCRIPT_URL);
+
+    // LOGIN HANDLER
+    async function handleLogin(event) {
+      event.preventDefault();
+      const phone = document.getElementById('loginPhone').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+
+      if (!SCRIPT_URL) {
+        showLoginMessage("❌ API not configured", true);
+        return;
+      }
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'adminAuth', adminKey: password })
+        });
+
+        const text = await response.text();
+        if (text.startsWith('<')) throw new Error("Server error");
+
+        const result = JSON.parse(text);
+
+        if (result.authenticated) {
+          currentAdmin = { phone: phone, authenticated: true };
+          localStorage.setItem("majihesabu_admin", JSON.stringify(currentAdmin));
+          showDashboard();
+          loadDashboard();
+        } else {
+          showLoginMessage("❌ Invalid passcode", true);
+        }
+      } catch (err) {
+        showLoginMessage("❌ " + err.message, true);
+      }
+    }
+
+    function showLoginMessage(msg, isError) {
+      const el = document.getElementById('loginMessage');
+      el.innerHTML = `<div class="p-3 rounded-lg text-sm font-bold ${
+        isError ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-green-100 text-green-700 border border-green-300'
+      }">${msg}</div>`;
+    }
+
+    function showDashboard() {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.remove('hidden');
+    }
+
+    // LOAD DASHBOARD STATS
+    async function loadDashboard() {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getDashboard' })
+        });
+
+        const text = await response.text();
+        if (text.startsWith('<')) throw new Error("Server error");
+
+        const data = JSON.parse(text);
+
+        if (data.success && data.financials) {
+          const rev = data.financials.totalRevenue || 0;
+          const col = data.financials.totalCollected || 0;
+          const out = data.financials.outstandingBalance || 0;
+          const rate = data.financials.collectionRate || 0;
+
+          document.getElementById('totalRevenue').innerText = Number(rev).toLocaleString();
+          document.getElementById('totalCollected').innerText = Number(col).toLocaleString();
+          document.getElementById('totalOutstanding').innerText = Number(out).toLocaleString();
+          document.getElementById('collectionRate').innerText = Number(rate).toFixed(1);
+
+          document.getElementById('dashRevenue').innerText = "KES " + Number(rev).toLocaleString();
+          document.getElementById('dashCollected').innerText = "KES " + Number(col).toLocaleString();
+          document.getElementById('dashOutstanding').innerText = "KES " + Number(out).toLocaleString();
+          document.getElementById('dashRate').innerText = Number(rate).toFixed(1);
+        }
+      } catch (err) {
+        console.error("Dashboard error:", err);
+      }
+    }
+
+    // ADD CUSTOMER
+    async function handleAddCustomer(event) {
+      event.preventDefault();
+
+      const payload = {
+        action: 'createCustomer',
+        phone: document.getElementById('custPhone').value,
+        name: document.getElementById('custName').value,
+        type: document.getElementById('custType').value,
+        meterNumber: document.getElementById('custMeter').value,
+        location: document.getElementById('custLocation').value,
+        email: document.getElementById('custEmail').value
+      };
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await response.text();
+        if (text.startsWith('<')) throw new Error("Server error");
+
+        const result = JSON.parse(text);
+
+        if (result.success) {
+          showMessage('addCustomerMessage', `✅ Customer ${result.customerId} created!`);
+          event.target.reset();
+          loadDashboard();
+        } else {
+          showMessage('addCustomerMessage', '❌ ' + result.message, true);
+        }
+      } catch (err) {
+        showMessage('addCustomerMessage', '❌ ' + err.message, true);
+      }
+    }
+
+    // METER READING
+    async function handleMeterReading(event) {
+      event.preventDefault();
+
+      const payload = {
+        action: 'recordMeterReading',
+        customerId: document.getElementById('meterCustomerId').value,
+        meterNumber: document.getElementById('meterNumber').value,
+        reading: document.getElementById('meterReading').value,
+        recordedBy: document.getElementById('recordedBy').value
+      };
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await response.text();
+        if (text.startsWith('<')) throw new Error("Server error");
+
+        const result = JSON.parse(text);
+
+        if (result.success) {
+          showMessage('meterReadingMessage', `✅ Invoice ${result.invoiceId} generated! Amount: KES ${Number(result.amountDue).toLocaleString()}`);
+          event.target.reset();
+          loadDashboard();
+        } else {
+          showMessage('meterReadingMessage', '❌ ' + result.message, true);
+        }
+      } catch (err) {
+        showMessage('meterReadingMessage', '❌ ' + err.message, true);
+      }
+    }
+
+    // LOAD DEBTORS
+    async function loadDebtors() {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getAgedDebtors' })
+        });
+
+        const text = await response.text();
+        if (text.startsWith('<')) throw new Error("Server error");
+
+        const data = JSON.parse(text);
+        const tbody = document.getElementById('debtorsBody');
+
+        if (data.success && data.debtors && data.debtors.length > 0) {
+          tbody.innerHTML = data.debtors.map(d => {
+            const days = d.agingDays || 0;
+            let statusColor = "bg-yellow-100 text-yellow-800";
+            if (days > 60) statusColor = "bg-red-100 text-red-800";
+            else if (days > 30) statusColor = "bg-orange-100 text-orange-800";
+
+            return `
+              <tr class="hover:bg-gray-50 transition">
+                <td class="p-3">${d.customerName}</td>
+                <td class="p-3">${d.phone}</td>
+                <td class="p-3 font-mono text-xs">${d.invoiceNo}</td>
+                <td class="p-3 text-right font-bold text-red-600">KES ${Number(d.amountDue).toLocaleString()}</td>
+                <td class="p-3 text-center"><span class="px-2 py-1 rounded text-xs font-bold ${statusColor}">${days} days</span></td>
+                <td class="p-3 text-center"><a href="https://wa.me/${d.phone.replace(/\+/g, '')}" target="_blank" class="text-green-600 hover:text-green-800 font-bold">💬 Remind</a></td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">No debtors found</td></tr>';
+        }
+      } catch (err) {
+        console.error("Debtors error:", err);
+      }
+    }
+
+    // LOAD CUSTOMERS
+    async function loadCustomers() {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getAllCustomers' })
+        });
+
+        const text = await response.text();
+        if (text.startsWith('<')) throw new Error("Server error");
+
+        const data = JSON.parse(text);
+        const tbody = document.getElementById('customersBody');
+
+        if (data.success && data.customers && data.customers.length > 0) {
+          tbody.innerHTML = data.customers.map(c => `
+            <tr class="hover:bg-gray-50 transition">
+              <td class="p-3 text-xs font-mono">${c.customerId}</td>
+              <td class="p-3">${c.name}</td>
+              <td class="p-3">${c.phone}</td>
+              <td class="p-3 font-mono">${c.meterNumber}</td>
+              <td class="p-3 text-xs">${c.type}</td>
+              <td class="p-3 text-center"><span class="px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-800">${c.status || 'Active'}</span></td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">No customers found</td></tr>';
+        }
+      } catch (err) {
+        console.error("Customers error:", err);
+      }
+    }
+
+    // UTILITIES
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-blue-700');
+      });
+
+      document.getElementById(tabName + 'Tab').classList.remove('hidden');
+      event.target.classList.add('bg-white', 'text-blue-700');
+
+      if (tabName === 'debtors') loadDebtors();
+      if (tabName === 'customers') loadCustomers();
+    }
+
+    function showMessage(elementId, message, isError = false) {
+      const el = document.getElementById(elementId);
+      el.innerHTML = `<div class="p-3 rounded-lg text-sm font-bold ${
+        isError ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-green-100 text-green-700 border border-green-300'
+      }">${message}</div>`;
+      setTimeout(() => { el.innerHTML = ''; }, 5000);
+    }
+
+    function logout() {
+      currentAdmin = null;
+      localStorage.removeItem("majihesabu_admin");
+      document.getElementById('loginSection').classList.remove('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
+      document.getElementById('logoutBtn').classList.add('hidden');
+      document.getElementById('loginPhone').value = '';
+      document.getElementById('loginPassword').value = '';
+    }
+
+    // CHECK SAVED SESSION
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem("majihesabu_admin");
+      if (saved) {
+        try {
+          currentAdmin = JSON.parse(saved);
+          showDashboard();
+          loadDashboard();
+        } catch (e) {
+          localStorage.removeItem("majihesabu_admin");
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
