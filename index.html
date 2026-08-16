@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joy Water Supplies - Customer Portal</title>
+  
+  <!-- ✅ CRITICAL: config.js MUST load FIRST -->
+  <script src="config.js"></script>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💧</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+  <!-- HEADER -->
+  <header class="bg-blue-800 text-white shadow-lg">
+    <div class="container mx-auto px-4 py-4 text-center">
+      <div class="flex justify-center items-center gap-3 mb-2">
+        <span class="text-3xl">💧</span>
+        <h1 class="text-2xl font-bold">Joy Water Supplies</h1>
+      </div>
+      <p class="text-xs text-blue-200">Customer Self-Service Portal</p>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-6 max-w-2xl">
+
+    <!-- LOGIN SECTION -->
+    <div id="loginSection" class="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
+      <div class="text-center mb-6">
+        <div class="inline-block bg-blue-50 p-4 rounded-full mb-3">
+          <span class="text-4xl">🔓</span>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Login to Your Account</h2>
+        <p class="text-xs text-gray-500 mt-2">View your water bill and account details</p>
+      </div>
+
+      <div id="loginMessage" class="mb-4"></div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Phone Number <span class="text-xs text-gray-500">(+254 or 0)</span>
+          </label>
+          <input type="tel" id="loginPhone" placeholder="+254700000001 or 0700000001" required
+            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Meter Number</label>
+          <input type="text" id="loginMeter" placeholder="e.g., M-00123" required
+            class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+
+        <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition">
+          🔓 Login to Account
+        </button>
+      </form>
+    </div>
+
+    <!-- CUSTOMER DASHBOARD -->
+    <div id="dashboardSection" class="hidden space-y-6">
+
+      <!-- WELCOME CARD -->
+      <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white rounded-2xl shadow-xl p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs text-blue-200 uppercase font-semibold">Welcome</p>
+            <h2 id="customerName" class="text-2xl font-bold mt-1">Loading...</h2>
+            <p id="customerMeter" class="text-sm text-blue-200 mt-2">Meter: M-00000</p>
+          </div>
+          <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg font-bold text-sm transition">
+            🚪 Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- ACCOUNT SUMMARY -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
+          <p class="text-xs text-gray-600 font-semibold">Account ID</p>
+          <p id="customerId" class="text-lg font-bold text-gray-800 mt-2">CUST-0000</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
+          <p class="text-xs text-gray-600 font-semibold">Account Type</p>
+          <p id="customerType" class="text-lg font-bold text-gray-800 mt-2">Apartment Tenant</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
+          <p class="text-xs text-gray-600 font-semibold">Account Status</p>
+          <p id="customerStatus" class="text-lg font-bold text-green-600 mt-2">✅ Active</p>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="flex gap-2 bg-gray-200 p-2 rounded-xl overflow-x-auto">
+        <button onclick="switchTab('invoices')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg bg-white text-blue-700 font-bold text-sm whitespace-nowrap transition">
+          📋 Invoices
+        </button>
+        <button onclick="switchTab('payments')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
+          💳 Payments
+        </button>
+        <button onclick="switchTab('trends')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
+          📈 Trends
+        </button>
+      </div>
+
+      <!-- TAB CONTENTS -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+
+        <!-- INVOICES TAB -->
+        <div id="invoicesTab" class="tab-content">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">📋 Recent Invoices</h3>
+          <button onclick="loadInvoices()" class="mb-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
+            🔄 Refresh
+          </button>
+          <div class="space-y-3" id="invoicesList">
+            <p class="text-center text-gray-500">Loading invoices...</p>
+          </div>
+        </div>
+
+        <!-- PAYMENTS TAB -->
+        <div id="paymentsTab" class="tab-content hidden">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">💳 Payment History</h3>
+          <button onclick="loadPayments()" class="mb-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
+            🔄 Refresh
+          </button>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-100 border-b">
+                <tr>
+                  <th class="p-3 text-left font-bold">Date</th>
+                  <th class="p-3 text-left font-bold">Amount</th>
+                  <th class="p-3 text-left font-bold">Method</th>
+                  <th class="p-3 text-left font-bold">Status</th>
+                </tr>
+              </thead>
+              <tbody id="paymentsBody" class="divide-y">
+                <tr>
+                  <td colspan="4" class="p-4 text-center text-gray-500">Loading payments...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TRENDS TAB -->
+        <div id="trendsTab" class="tab-content hidden">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Consumption Trends</h3>
+          <button onclick="loadTrends()" class="mb-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
+            🔄 Refresh
+          </button>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-100 border-b">
+                <tr>
+                  <th class="p-3 text-left font-bold">Month</th>
+                  <th class="p-3 text-right font-bold">Consumption</th>
+                  <th class="p-3 text-right font-bold">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="trendsBody" class="divide-y">
+                <tr>
+                  <td colspan="3" class="p-4 text-center text-gray-500">Loading trends...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- HELP SECTION -->
+      <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+        <h3 class="font-bold text-gray-800 mb-3">❓ Need Help?</h3>
+        <p class="text-sm text-gray-700 mb-3">For billing inquiries or to pay your bill, contact us:</p>
+        <div class="space-y-2 text-sm">
+          <p><strong>Phone:</strong> +254768789382</p>
+          <p><strong>WhatsApp:</strong> <a href="https://wa.me/254768789382" target="_blank" class="text-blue-600 hover:underline">Chat with us</a></p>
+          <p><strong>Email:</strong> joywatersupplies@gmail.com</p>
+          <p><strong>Payment Till:</strong> 4984254 (M-Pesa)</p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-800 text-gray-300 text-center py-4 mt-8 text-xs">
+    &copy; 2026 Joy Water Supplies | Powered by MajiHesabu
+  </footer>
+
+  <script>
+    // ✅ API URL from config.js
+    const SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) 
+      ? CONFIG.API_ENDPOINT 
+      : null;
+
+    let currentCustomer = null;
+
+    console.log("✅ Customer Portal Loaded");
+    console.log("API Endpoint:", SCRIPT_URL);
+
+    // LOGIN HANDLER
+    async function handleLogin(event) {
+      event.preventDefault();
+      const phone = document.getElementById('loginPhone').value.trim();
+      const meterNumber = document.getElementById('loginMeter').value.trim();
+
+      if (!SCRIPT_URL) {
+        showLoginMessage("❌ API not configured", true);
+        return;
+      }
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ 
+            action: 'authenticate', 
+            phone: phone, 
+            meterNumber: meterNumber 
+          })
+        });
+
+        const text = await response.text();
+        if (text.startsWith('<')) throw new Error("Server error");
+
+        const result = JSON.parse(text);
+
+        if (result.authenticated) {
+          currentCustomer = result;
+          localStorage.setItem("majihesabu_customer", JSON.stringify(result));
+          showDashboard();
+          loadInvoices();
+        } else {
+          showLoginMessage("❌ Invalid phone or meter number", true);
+        }
+      } catch (err) {
+        showLoginMessage("❌ " + err.message, true);
+      }
+    }
+
+    function showLoginMessage(msg, isError) {
+      const el = document.getElementById('loginMessage');
+      el.innerHTML = `<div class="p-3 rounded-lg text-sm font-bold ${
+        isError ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-green-100 text-green-700 border border-green-300'
+      }">${msg}</div>`;
+    }
+
+    function showDashboard() {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.remove('hidden');
+
+      document.getElementById('customerId').innerText = currentCustomer.customerId || 'CUST-0000';
+      document.getElementById('customerName').innerText = currentCustomer.name || 'Customer';
+      document.getElementById('customerMeter').innerText = 'Meter: ' + (currentCustomer.meterNumber || 'M-0000');
+      document.getElementById('customerType').innerText = currentCustomer.type || 'Apartment Tenant';
+      document.getElementById('customerStatus').innerText = '✅ ' + (currentCustomer.status || 'Active');
+    }
+
+    // LOAD INVOICES
+    async function loadInvoices() {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ 
+            action: 'getInvoiceHistory', 
+            customerId: currentCustomer.customerId 
+          })
+        });
+
+        const text = await response.text();
+        if (text.startsWith('<')) throw new Error("Server error");
+
+        const data = JSON.parse(text);
+        const listEl = document.getElementById('invoicesList');
+
+        if (data.success && data.invoices && data.invoices.length > 0) {
+          listEl.innerHTML = data.invoices.map(inv => {
+            const isPaid = inv.status && inv.status.toUpperCase() === 'PAID';
+            const amount = Number(inv.totalAmount || 0);
+            return `
+              <div class="p-4 border rounded-lg hover:shadow-md transition ${isPaid ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="font-bold text-gray-800">${inv.month || inv.date || 'Invoice'}</p>
+                    <p class="text-xs text-gray-600 mt-1">Amount: <span class="font-bold">KES ${amount.toLocaleString()}</span></p>
+                  </div>
+                  <span class="px-2 py-1 rounded text-xs font-bold ${isPaid ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}">
+                    ${inv.status || 'UNPAID'}
+                  </span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } else {
+          listEl.innerHTML = '<p class="text-center text-gray-500">No invoices found</p>';
+        }
+      } catch (err) {
+        console.error("Invoices error:", err);
+        document.getElementById('invoicesList').innerHTML = '<p class="text-center text-red-500">Error loading invoices</p>';
+      }
+    }
+
+    // LOAD PAYMENTS
+    async function loadPayments() {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ 
+            action: 'getPaymentHistory', 
+            customerId: currentCustomer.customerId 
+          })
+        });
+
+        const text = await response.text();
+        if (text.startsWith('<')) throw new Error("Server error");
+
+        const data = JSON.parse(text);
+        const tbody = document.getElementById('paymentsBody');
+
+        if (data.success && data.payments && data.payments.length > 0) {
+          tbody.innerHTML = data.payments.map(pay => `
+            <tr class="hover:bg-gray-50">
+              <td class="p-3">${pay.date || 'N/A'}</td>
+              <td class="p-3 font-bold text-green-600">KES ${Number(pay.amount || 0).toLocaleString()}</td>
+              <td class="p-3">${pay.method || 'M-Pesa'}</td>
+              <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-800">${pay.status || 'Posted'}</span></td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No payments found</td></tr>';
+        }
+      } catch (err) {
+        console.error("Payments error:", err);
+      }
+    }
+
+    // LOAD TRENDS
+    async function loadTrends() {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ 
+            action: 'getConsumptionTrends', 
+            customerId: currentCustomer.customerId,
+            months: 6
+          })
+        });
+
+        const text = await response.text();
+        if (text.startsWith('<')) throw new Error("Server error");
+
+        const data = JSON.parse(text);
+        const tbody = document.getElementById('trendsBody');
+
+        if (data.success && data.trends && data.trends.length > 0) {
+          tbody.innerHTML = data.trends.map(trend => `
+            <tr class="hover:bg-gray-50">
+              <td class="p-3">${trend.month || 'N/A'}</td>
+              <td class="p-3 text-right font-bold text-blue-600">${trend.consumption || 0} units</td>
+              <td class="p-3 text-right font-bold">KES ${Number(trend.amount || 0).toLocaleString()}</td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No trends found</td></tr>';
+        }
+      } catch (err) {
+        console.error("Trends error:", err);
+      }
+    }
+
+    // UTILITIES
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-blue-700');
+      });
+
+      document.getElementById(tabName + 'Tab').classList.remove('hidden');
+      event.target.classList.add('bg-white', 'text-blue-700');
+
+      if (tabName === 'payments') loadPayments();
+      if (tabName === 'trends') loadTrends();
+    }
+
+    function logout() {
+      currentCustomer = null;
+      localStorage.removeItem("majihesabu_customer");
+      document.getElementById('loginSection').classList.remove('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
+      document.getElementById('loginPhone').value = '';
+      document.getElementById('loginMeter').value = '';
+    }
+
+    // CHECK SAVED SESSION
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem("majihesabu_customer");
+      if (saved) {
+        try {
+          currentCustomer = JSON.parse(saved);
+          showDashboard();
+          loadInvoices();
+        } catch (e) {
+          localStorage.removeItem("majihesabu_customer");
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
