@@ -1,11 +1,10 @@
 /**
  * MajiHesabu - Configuration File
- * Updated with new API endpoint - August 2026
+ * Updated with global window binding - August 2026
  */
-
-if (typeof CONFIG === 'undefined') {
-  const CONFIG = {
-    // ✅ NEW API ENDPOINT - UPDATED
+if (typeof window.CONFIG === 'undefined') {
+  window.CONFIG = {
+    // ✅ API ENDPOINT
     API_ENDPOINT: "https://script.google.com/macros/s/AKfycbz7CC5O-txelyU2cQr7AdOykcACmBMckzwgIeffnBw-xpJ17A4dbRnahrBNy_atxtzG/exec",
     
     // COMPANY INFO
@@ -31,16 +30,9 @@ if (typeof CONFIG === 'undefined') {
     // ADMIN
     ADMIN_KEY: "MajiAdmin2026",
     
-    // COLORS
-    PRIMARY_COLOR: "#1976D2",
-    SECONDARY_COLOR: "#1565C0",
-    SUCCESS_COLOR: "#4CAF50",
-    DANGER_COLOR: "#f44336",
-    WARNING_COLOR: "#ff9800",
-    
     // HELPERS
     formatCurrency: function(amount) {
-      return this.CURRENCY_SYMBOL + " " + Number(amount).toLocaleString();
+      return this.CURRENCY_SYMBOL + " " + Number(amount || 0).toLocaleString();
     },
     
     normalizePhone: function(phone) {
@@ -52,3 +44,5 @@ if (typeof CONFIG === 'undefined') {
     }
   };
 }
+
+var CONFIG = window.CONFIG;
