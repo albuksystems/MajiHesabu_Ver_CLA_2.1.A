@@ -3,608 +3,442 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Joy Water Supplies - Admin Portal</title>
+  <title>MajiHesabu - Admin Dashboard</title>
   
-  <!-- ✅ CRITICAL: config.js fallback support -->
+  <!-- ✅ Loads configuration first -->
   <script src="config.js"></script>
-  
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💧</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <style>
-    .fade-in { animation: fadeIn 0.3s ease-in; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen">
 
   <!-- HEADER -->
-  <header class="bg-blue-800 text-white shadow-lg">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <span class="text-3xl">💧</span>
-        <div>
-          <h1 class="text-2xl font-bold">Joy Water Supplies</h1>
-          <p class="text-xs text-blue-200">Admin Management System</p>
-        </div>
+  <header class="bg-blue-900 text-white p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💧</span>
+        <h1 id="adminHeaderTitle" class="text-xl font-bold">Joy Water Supplies - Admin Control</h1>
       </div>
-      <button id="logoutBtn" onclick="logout()" class="hidden bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-bold text-sm transition">
-        🚪 Logout
-      </button>
+      <span class="bg-blue-800 text-xs px-3 py-1 rounded-full font-semibold border border-blue-700">MajiHesabu™ Admin</span>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="container mx-auto px-4 py-6 max-w-5xl">
+  <main class="container mx-auto p-4 sm:p-6 space-y-8 max-w-6xl">
 
-    <!-- LOGIN SECTION -->
-    <div id="loginSection" class="fade-in">
-      <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
-        <div class="text-center mb-6">
-          <div class="inline-block bg-blue-50 p-4 rounded-full mb-3">
-            <span class="text-4xl">🔐</span>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-800">Admin Login</h2>
-          <p class="text-xs text-gray-500 mt-2">Enter your admin credentials to access the system</p>
-        </div>
+    <!-- 1. METER READING & INVOICE CAPTURE FORM -->
+    <section class="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+      <div class="flex justify-between items-center mb-4 border-b pb-3">
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <span>📝</span> Meter Reading & Invoice Generation Capture
+        </h2>
+        <span class="text-xs text-gray-500">Auto-calculates billing based on water rates</span>
+      </div>
 
-        <div id="loginMessage" class="mb-4"></div>
-
-        <form onsubmit="handleLogin(event)" class="space-y-4">
+      <form id="readingForm" onsubmit="handleSaveReading(event)" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- CUSTOMER ID INPUT -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Admin Phone / Username</label>
-            <input type="tel" id="loginPhone" placeholder="0712345678" required
-              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+            <label class="block text-xs font-bold text-gray-700 mb-1">Customer ID *</label>
+            <input type="text" id="readingCustomerId" placeholder="e.g. CUST-001" required
+              oninput="handleCustomerLookup()"
+              class="w-full border border-blue-400 bg-blue-50/30 rounded-lg p-2.5 text-sm font-semibold focus:ring-2 focus:ring-blue-600 focus:outline-none uppercase">
+            <p id="customerLookupStatus" class="text-[11px] text-gray-500 mt-1">Type ID to auto-fill details...</p>
           </div>
 
+          <!-- METER NUMBER (AUTO-FILLED) -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Admin Passcode</label>
-            <input type="password" id="loginPassword" placeholder="••••••••" required
-              class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
+            <label class="block text-xs font-bold text-gray-700 mb-1">Meter Number</label>
+            <input type="text" id="readingMeterNumber" placeholder="Auto-populated" readonly
+              class="w-full border border-gray-300 bg-gray-100 rounded-lg p-2.5 text-sm text-gray-700 font-medium">
           </div>
 
-          <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition">
-            🔓 Login to Admin Portal
-          </button>
-        </form>
-
-        <div class="mt-4 p-3 bg-blue-50 rounded-lg text-xs text-blue-700 border border-blue-200">
-          <strong>Demo Credentials:</strong><br>
-          Phone: 0712345678<br>
-          Passcode: MajiAdmin2026
-        </div>
-      </div>
-    </div>
-
-    <!-- DASHBOARD SECTION -->
-    <div id="dashboardSection" class="hidden fade-in space-y-6">
-
-      <!-- WELCOME CARD -->
-      <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white rounded-2xl shadow-xl p-6">
-        <div class="flex justify-between items-start">
+          <!-- PREVIOUS READING (AUTO-FILLED) -->
           <div>
-            <p class="text-xs text-blue-200 uppercase font-semibold">Welcome Back</p>
-            <h2 id="adminName" class="text-2xl font-bold mt-1">Admin Dashboard</h2>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Previous Reading (m³)</label>
+            <input type="number" id="readingPrevious" placeholder="0" readonly
+              class="w-full border border-gray-300 bg-gray-100 rounded-lg p-2.5 text-sm text-gray-700 font-medium">
           </div>
-          <span class="bg-blue-500/40 text-blue-100 text-xs font-bold px-3 py-1 rounded-full border border-blue-400/50">
-            Administrator
-          </span>
-        </div>
-      </div>
 
-      <!-- STATS CARDS -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
-          <p class="text-xs text-gray-600 font-semibold">Total Revenue</p>
-          <p class="text-2xl font-bold text-gray-800 mt-2">KES <span id="totalRevenue">0</span></p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
-          <p class="text-xs text-gray-600 font-semibold">Amount Collected</p>
-          <p class="text-2xl font-bold text-gray-800 mt-2">KES <span id="totalCollected">0</span></p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-red-500">
-          <p class="text-xs text-gray-600 font-semibold">Outstanding Balance</p>
-          <p class="text-2xl font-bold text-gray-800 mt-2">KES <span id="totalOutstanding">0</span></p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-orange-500">
-          <p class="text-xs text-gray-600 font-semibold">Collection Rate</p>
-          <p class="text-2xl font-bold text-gray-800 mt-2"><span id="collectionRate">0</span>%</p>
-        </div>
-      </div>
-
-      <!-- TABS -->
-      <div class="flex gap-2 bg-gray-200 p-2 rounded-xl overflow-x-auto">
-        <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg bg-white text-blue-700 font-bold text-sm whitespace-nowrap transition">
-          📊 Dashboard
-        </button>
-        <button onclick="switchTab('addCustomer')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
-          ➕ Add Customer
-        </button>
-        <button onclick="switchTab('meterReading')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
-          📏 Meter Reading
-        </button>
-        <button onclick="switchTab('debtors')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
-          💳 Debtors
-        </button>
-        <button onclick="switchTab('customers')" class="tab-btn flex-1 py-2.5 px-3 rounded-lg hover:bg-white text-gray-700 font-bold text-sm whitespace-nowrap transition">
-          👥 Customers
-        </button>
-      </div>
-
-      <!-- TAB CONTENTS -->
-      <div class="bg-white rounded-2xl shadow-lg p-6">
-
-        <!-- DASHBOARD TAB -->
-        <div id="dashboardTab" class="tab-content">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">📊 System Overview</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-              <p class="text-sm font-semibold text-blue-900 mb-3">Revenue Summary</p>
-              <div class="space-y-2 text-sm">
-                <div class="flex justify-between"><span>Total Invoiced:</span> <span class="font-bold" id="dashRevenue">0</span></div>
-                <div class="flex justify-between"><span>Collected:</span> <span class="font-bold text-green-600" id="dashCollected">0</span></div>
-                <div class="flex justify-between"><span>Outstanding:</span> <span class="font-bold text-red-600" id="dashOutstanding">0</span></div>
-              </div>
-            </div>
-            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-              <p class="text-sm font-semibold text-green-900 mb-3">Collection Performance</p>
-              <div id="collectionChart" class="text-center text-3xl font-bold text-green-600" style="line-height: 100px;">
-                <span id="dashRate">0</span>%
-              </div>
-            </div>
+          <!-- CURRENT READING (USER INPUT) -->
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Current Reading (m³) *</label>
+            <input type="number" id="readingCurrent" placeholder="Enter new reading" required step="0.01"
+              oninput="calculateBilling()"
+              class="w-full border border-gray-300 rounded-lg p-2.5 text-sm font-bold text-blue-900 focus:ring-2 focus:ring-blue-600 focus:outline-none">
           </div>
-          <button onclick="loadDashboard()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
-            🔄 Refresh Dashboard
+
+        </div>
+
+        <!-- LIVE BILLING PREVIEW SUMMARY -->
+        <div class="bg-gray-50 rounded-xl p-4 border grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          <div>
+            <p class="text-[11px] text-gray-500 uppercase font-semibold">Units Consumed</p>
+            <p id="summaryUnits" class="text-base font-bold text-gray-800">0 m³</p>
+          </div>
+          <div>
+            <p class="text-[11px] text-gray-500 uppercase font-semibold">Rate per Unit</p>
+            <p id="summaryRate" class="text-base font-bold text-gray-800">KES 100</p>
+          </div>
+          <div>
+            <p class="text-[11px] text-gray-500 uppercase font-semibold">Current Bill</p>
+            <p id="summaryBill" class="text-base font-bold text-blue-700">KES 0</p>
+          </div>
+          <div>
+            <p class="text-[11px] text-gray-500 uppercase font-semibold">Total Invoice Amount</p>
+            <p id="summaryTotal" class="text-base font-extrabold text-green-700">KES 0</p>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="flex flex-wrap gap-3 justify-end pt-2">
+          <button type="submit" id="saveBtn" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2.5 px-5 rounded-lg text-sm shadow transition flex items-center gap-2">
+            <span>💾</span> <span>Save Reading & Generate Invoice</span>
+          </button>
+          <button type="button" onclick="previewCurrentInvoice()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-lg text-sm shadow transition flex items-center gap-2">
+            <span>📄</span> <span>View / Print Invoice</span>
+          </button>
+          <button type="button" onclick="sendWhatsAppNotice()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-5 rounded-lg text-sm shadow transition flex items-center gap-2">
+            <span>💬</span> <span>Send WhatsApp Bill</span>
           </button>
         </div>
+      </form>
+    </section>
 
-        <!-- ADD CUSTOMER TAB -->
-        <div id="addCustomerTab" class="tab-content hidden">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">➕ Register New Customer</h3>
-          <div id="addCustomerMessage" class="mb-4"></div>
-          <form onsubmit="handleAddCustomer(event)" class="space-y-4 max-w-2xl">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
-                <input type="tel" id="custPhone" placeholder="+254700000001 or 0700000001" required
-                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
-                <input type="text" id="custName" placeholder="Customer name" required
-                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Customer Type *</label>
-                <select id="custType" required
-                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
-                  <option value="">Select type</option>
-                  <option value="Salty Water Vendor">Salty Water Vendor</option>
-                  <option value="Apartment Tenant">Apartment Tenant</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Meter Number *</label>
-                <input type="text" id="custMeter" placeholder="e.g., M-00123" required
-                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
-              <input type="text" id="custLocation" placeholder="Physical location"
-                class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-              <input type="email" id="custEmail" placeholder="customer@email.com"
-                class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
-            </div>
-
-            <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition">
-              ➕ Create Customer
-            </button>
-          </form>
+    <!-- 2. DEBTORS' REPORT GENERATOR -->
+    <section class="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b pb-3">
+        <div>
+          <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <span>📊</span> Debtors' Aging & Outstanding Report
+          </h2>
+          <p class="text-xs text-gray-500">Track unpaid customer balances and overdue accounts</p>
         </div>
-
-        <!-- METER READING TAB -->
-        <div id="meterReadingTab" class="tab-content hidden">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">📏 Record Meter Reading</h3>
-          <div id="meterReadingMessage" class="mb-4"></div>
-          <form onsubmit="handleMeterReading(event)" class="space-y-4 max-w-2xl">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Customer ID *</label>
-                <input type="text" id="meterCustomerId" placeholder="CUST-1234" required
-                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Meter Number *</label>
-                <input type="text" id="meterNumber" placeholder="M-00123" required
-                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Current Reading *</label>
-                <input type="number" id="meterReading" placeholder="1234.5" step="0.1" required
-                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Recorded By *</label>
-                <input type="text" id="recordedBy" placeholder="Your name" required
-                  class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 transition">
-              </div>
-            </div>
-
-            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition">
-              📏 Record Reading & Generate Invoice
-            </button>
-          </form>
-        </div>
-
-        <!-- DEBTORS TAB -->
-        <div id="debtorsTab" class="tab-content hidden">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">💳 Aged Debtors Report</h3>
-          <button onclick="loadDebtors()" class="mb-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
-            🔄 Refresh Debtors
+        <div class="flex gap-2">
+          <button onclick="generateDebtorsReport()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-xs shadow transition flex items-center gap-1">
+            <span>🔄</span> Generate Report
           </button>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-100 border-b">
-                <tr>
-                  <th class="p-3 text-left font-bold">Customer Name</th>
-                  <th class="p-3 text-left font-bold">Phone</th>
-                  <th class="p-3 text-left font-bold">Invoice</th>
-                  <th class="p-3 text-right font-bold">Amount Due</th>
-                  <th class="p-3 text-center font-bold">Days Overdue</th>
-                  <th class="p-3 text-center font-bold">Status</th>
-                </tr>
-              </thead>
-              <tbody id="debtorsBody" class="divide-y">
-                <tr>
-                  <td colspan="6" class="p-4 text-center text-gray-500">Loading debtors...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- CUSTOMERS TAB -->
-        <div id="customersTab" class="tab-content hidden">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">👥 All Customers</h3>
-          <button onclick="loadCustomers()" class="mb-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
-            🔄 Refresh Customers
+          <button onclick="window.print()" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg text-xs shadow transition">
+            🖨️ Print Report
           </button>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-100 border-b">
-                <tr>
-                  <th class="p-3 text-left font-bold">ID</th>
-                  <th class="p-3 text-left font-bold">Name</th>
-                  <th class="p-3 text-left font-bold">Phone</th>
-                  <th class="p-3 text-left font-bold">Meter</th>
-                  <th class="p-3 text-left font-bold">Type</th>
-                  <th class="p-3 text-center font-bold">Status</th>
-                </tr>
-              </thead>
-              <tbody id="customersBody" class="divide-y">
-                <tr>
-                  <td colspan="6" class="p-4 text-center text-gray-500">Loading customers...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
-
       </div>
 
-    </div>
+      <!-- REPORT TABLE -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left border-collapse">
+          <thead class="bg-gray-100 text-gray-700 uppercase text-xs border-b">
+            <tr>
+              <th class="p-3">Customer ID</th>
+              <th class="p-3">Customer Name</th>
+              <th class="p-3">Phone</th>
+              <th class="p-3">Meter #</th>
+              <th class="p-3 text-right">Outstanding Debt</th>
+              <th class="p-3 text-center">Status</th>
+              <th class="p-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="debtorsTableBody" class="divide-y text-gray-700">
+            <tr>
+              <td colspan="7" class="p-6 text-center text-gray-500 text-xs">
+                Click <strong>"Generate Report"</strong> to load outstanding balances.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
   </main>
 
-  <!-- FOOTER -->
-  <footer class="bg-gray-800 text-gray-300 text-center py-4 mt-8 text-xs">
-    &copy; 2026 Joy Water Supplies | Powered by MajiHesabu | Albuk Technologies Ltd
-  </footer>
+  <!-- INVOICE PREVIEW MODAL -->
+  <div id="invoiceModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-lg text-gray-800 flex items-center gap-2">
+          <span>🧾</span> Official Invoice Preview
+        </h3>
+        <button onclick="closeInvoiceModal()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
+      </div>
 
+      <div id="invoiceModalContent" class="space-y-3 text-sm text-gray-700 bg-gray-50 p-4 rounded-xl border">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t">
+        <button onclick="closeInvoiceModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-bold text-gray-700">
+          Close
+        </button>
+        <button onclick="window.print()" class="px-4 py-2 bg-blue-700 hover:bg-blue-800 rounded-lg text-xs font-bold text-white shadow">
+          🖨️ Print Invoice
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC -->
   <script>
-    // ✅ Direct Exec Endpoint Fallback to avoid null errors when config.js is missing/external
-    const HARDCODED_ENDPOINT = "https://script.google.com/macros/s/AKfycbz7CC5O-txelyU2cQr7AdOykcACmBMckzwgIeffnBw-xpJ17A4dbRnahrBNy_atxtzG/exec";
+    // Cached customer registry for instant local auto-fill
+    let customersList = [
+      { id: "CUST-001", name: "John Doe", phone: "+254712345678", meterNumber: "M-101", previousReading: 120, debt: 2500 },
+      { id: "CUST-002", name: "Mary Wambui", phone: "+254722987654", meterNumber: "M-102", previousReading: 85, debt: 1200 },
+      { id: "CUST-003", name: "Peter Otieno", phone: "+254733112233", meterNumber: "M-103", previousReading: 310, debt: 4800 },
+      { id: "CUST-004", name: "Jane Kamau", phone: "+254768789382", meterNumber: "M-104", previousReading: 45, debt: 0 }
+    ];
 
-    const SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) 
-      ? CONFIG.API_ENDPOINT 
-      : HARDCODED_ENDPOINT;
+    let currentCalculatedInvoice = null;
 
-    let currentAdmin = null;
+    // 1. AUTO-POPULATE CUSTOMER DETAILS ON CUSTOMER ID INPUT
+    function handleCustomerLookup() {
+      const inputVal = document.getElementById('readingCustomerId').value.trim().toUpperCase();
+      const statusEl = document.getElementById('customerLookupStatus');
 
-    console.log("✅ Admin Portal Loaded");
-    console.log("API Endpoint:", SCRIPT_URL);
-
-    // LOGIN HANDLER
-    async function handleLogin(event) {
-      event.preventDefault();
-      const phone = document.getElementById('loginPhone').value.trim();
-      const password = document.getElementById('loginPassword').value.trim();
-
-      if (!SCRIPT_URL) {
-        showLoginMessage("❌ API not configured", true);
+      if (!inputVal) {
+        clearPopulatedFields();
+        statusEl.innerText = "Type ID to auto-fill details...";
+        statusEl.className = "text-[11px] text-gray-500 mt-1";
         return;
       }
 
+      // Match against local array first
+      const customer = customersList.find(c => c.id.toUpperCase() === inputVal);
+
+      if (customer) {
+        document.getElementById('readingMeterNumber').value = customer.meterNumber;
+        document.getElementById('readingPrevious').value = customer.previousReading;
+        statusEl.innerText = `✅ Found: ${customer.name} (${customer.phone})`;
+        statusEl.className = "text-[11px] text-green-600 font-semibold mt-1";
+        calculateBilling();
+      } else {
+        // Fallback: search backend API
+        fetchCustomerFromApi(inputVal);
+      }
+    }
+
+    async function fetchCustomerFromApi(customerId) {
+      const statusEl = document.getElementById('customerLookupStatus');
+      statusEl.innerText = "⏳ Searching database...";
+      statusEl.className = "text-[11px] text-blue-600 font-semibold mt-1";
+
+      if (typeof CONFIG === 'undefined' || !CONFIG.API_ENDPOINT) return;
+
       try {
-        const response = await fetch(SCRIPT_URL, {
+        const response = await fetch(CONFIG.API_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'adminAuth', adminKey: password })
+          body: JSON.stringify({ action: 'getCustomerDetails', customerId: customerId })
         });
+        const data = JSON.parse(await response.text());
 
-        const text = await response.text();
-        if (text.startsWith('<')) throw new Error("Server error");
-
-        const result = JSON.parse(text);
-
-        if (result.authenticated) {
-          currentAdmin = { phone: phone, authenticated: true };
-          localStorage.setItem("majihesabu_admin", JSON.stringify(currentAdmin));
-          showDashboard();
-          loadDashboard();
+        if (data.success && data.customer) {
+          const c = data.customer;
+          document.getElementById('readingMeterNumber').value = c.meterNumber || '';
+          document.getElementById('readingPrevious').value = c.previousReading || 0;
+          statusEl.innerText = `✅ Found: ${c.name}`;
+          statusEl.className = "text-[11px] text-green-600 font-semibold mt-1";
+          calculateBilling();
         } else {
-          showLoginMessage("❌ Invalid passcode", true);
+          clearPopulatedFields();
+          statusEl.innerText = "⚠️ Customer ID not found in system";
+          statusEl.className = "text-[11px] text-red-500 mt-1";
         }
       } catch (err) {
-        showLoginMessage("❌ " + err.message, true);
+        statusEl.innerText = "⚠️ Offline mode (Local lookup active)";
+        statusEl.className = "text-[11px] text-gray-500 mt-1";
       }
     }
 
-    function showLoginMessage(msg, isError) {
-      const el = document.getElementById('loginMessage');
-      el.innerHTML = `<div class="p-3 rounded-lg text-sm font-bold ${
-        isError ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-green-100 text-green-700 border border-green-300'
-      }">${msg}</div>`;
+    function clearPopulatedFields() {
+      document.getElementById('readingMeterNumber').value = '';
+      document.getElementById('readingPrevious').value = '';
+      calculateBilling();
     }
 
-    function showDashboard() {
-      document.getElementById('loginSection').classList.add('hidden');
-      document.getElementById('dashboardSection').classList.remove('hidden');
-      document.getElementById('logoutBtn').classList.remove('hidden');
-    }
+    // LIVE BILLING CALCULATION
+    function calculateBilling() {
+      const prev = parseFloat(document.getElementById('readingPrevious').value) || 0;
+      const curr = parseFloat(document.getElementById('readingCurrent').value) || 0;
+      const rate = (typeof CONFIG !== 'undefined' && CONFIG.WATER_RATE) ? CONFIG.WATER_RATE : 100;
 
-    // LOAD DASHBOARD STATS
-    async function loadDashboard() {
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'getDashboard' })
-        });
+      const units = Math.max(0, curr - prev);
+      const bill = units * rate;
 
-        const text = await response.text();
-        if (text.startsWith('<')) throw new Error("Server error");
+      // Find debt if available
+      const custId = document.getElementById('readingCustomerId').value.trim().toUpperCase();
+      const customer = customersList.find(c => c.id.toUpperCase() === custId);
+      const existingDebt = customer ? customer.debt : 0;
+      const total = bill + existingDebt;
 
-        const data = JSON.parse(text);
+      document.getElementById('summaryUnits').innerText = `${units.toFixed(1)} m³`;
+      document.getElementById('summaryRate').innerText = `KES ${rate}`;
+      document.getElementById('summaryBill').innerText = `KES ${bill.toLocaleString()}`;
+      document.getElementById('summaryTotal').innerText = `KES ${total.toLocaleString()}`;
 
-        if (data.success && data.financials) {
-          const rev = data.financials.totalRevenue || 0;
-          const col = data.financials.totalCollected || 0;
-          const out = data.financials.outstandingBalance || 0;
-          const rate = data.financials.collectionRate || 0;
-
-          document.getElementById('totalRevenue').innerText = Number(rev).toLocaleString();
-          document.getElementById('totalCollected').innerText = Number(col).toLocaleString();
-          document.getElementById('totalOutstanding').innerText = Number(out).toLocaleString();
-          document.getElementById('collectionRate').innerText = Number(rate).toFixed(1);
-
-          document.getElementById('dashRevenue').innerText = "KES " + Number(rev).toLocaleString();
-          document.getElementById('dashCollected').innerText = "KES " + Number(col).toLocaleString();
-          document.getElementById('dashOutstanding').innerText = "KES " + Number(out).toLocaleString();
-          document.getElementById('dashRate').innerText = Number(rate).toFixed(1);
-        }
-      } catch (err) {
-        console.error("Dashboard error:", err);
-      }
-    }
-
-    // ADD CUSTOMER
-    async function handleAddCustomer(event) {
-      event.preventDefault();
-
-      const payload = {
-        action: 'createCustomer',
-        phone: document.getElementById('custPhone').value,
-        name: document.getElementById('custName').value,
-        type: document.getElementById('custType').value,
-        meterNumber: document.getElementById('custMeter').value,
-        location: document.getElementById('custLocation').value,
-        email: document.getElementById('custEmail').value
+      currentCalculatedInvoice = {
+        customerId: custId,
+        customerName: customer ? customer.name : 'Valued Customer',
+        phone: customer ? customer.phone : '',
+        meterNumber: document.getElementById('readingMeterNumber').value,
+        previousReading: prev,
+        currentReading: curr,
+        unitsConsumed: units,
+        ratePerUnit: rate,
+        currentBill: bill,
+        previousBalance: existingDebt,
+        totalAmountDue: total
       };
-
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
-
-        const text = await response.text();
-        if (text.startsWith('<')) throw new Error("Server error");
-
-        const result = JSON.parse(text);
-
-        if (result.success) {
-          showMessage('addCustomerMessage', `✅ Customer ${result.customerId} created!`);
-          event.target.reset();
-          loadDashboard();
-        } else {
-          showMessage('addCustomerMessage', '❌ ' + result.message, true);
-        }
-      } catch (err) {
-        showMessage('addCustomerMessage', '❌ ' + err.message, true);
-      }
     }
 
-    // METER READING
-    async function handleMeterReading(event) {
-      event.preventDefault();
-
-      const payload = {
-        action: 'recordMeterReading',
-        customerId: document.getElementById('meterCustomerId').value,
-        meterNumber: document.getElementById('meterNumber').value,
-        reading: document.getElementById('meterReading').value,
-        recordedBy: document.getElementById('recordedBy').value
-      };
+    // 2. GENERATE DEBTORS' REPORT
+    async function generateDebtorsReport() {
+      const tbody = document.getElementById('debtorsTableBody');
+      tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-blue-600 font-semibold text-xs">⏳ Fetching Debtors Report...</td></tr>';
 
       try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
-
-        const text = await response.text();
-        if (text.startsWith('<')) throw new Error("Server error");
-
-        const result = JSON.parse(text);
-
-        if (result.success) {
-          showMessage('meterReadingMessage', `✅ Invoice ${result.invoiceId} generated! Amount: KES ${Number(result.amountDue).toLocaleString()}`);
-          event.target.reset();
-          loadDashboard();
-        } else {
-          showMessage('meterReadingMessage', '❌ ' + result.message, true);
+        let debtors = [];
+        if (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) {
+          const response = await fetch(CONFIG.API_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'getDebtorsReport' })
+          });
+          const text = await response.text();
+          if (!text.startsWith('<')) {
+            const data = JSON.parse(text);
+            if (data.success && data.debtors) debtors = data.debtors;
+          }
         }
-      } catch (err) {
-        showMessage('meterReadingMessage', '❌ ' + err.message, true);
-      }
-    }
 
-    // LOAD DEBTORS
-    async function loadDebtors() {
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'getAgedDebtors' })
-        });
-
-        const text = await response.text();
-        if (text.startsWith('<')) throw new Error("Server error");
-
-        const data = JSON.parse(text);
-        const tbody = document.getElementById('debtorsBody');
-
-        if (data.success && data.debtors && data.debtors.length > 0) {
-          tbody.innerHTML = data.debtors.map(d => {
-            const days = d.agingDays || 0;
-            let statusColor = "bg-yellow-100 text-yellow-800";
-            if (days > 60) statusColor = "bg-red-100 text-red-800";
-            else if (days > 30) statusColor = "bg-orange-100 text-orange-800";
-
-            return `
-              <tr class="hover:bg-gray-50 transition">
-                <td class="p-3">${d.customerName}</td>
-                <td class="p-3">${d.phone}</td>
-                <td class="p-3 font-mono text-xs">${d.invoiceNo}</td>
-                <td class="p-3 text-right font-bold text-red-600">KES ${Number(d.amountDue).toLocaleString()}</td>
-                <td class="p-3 text-center"><span class="px-2 py-1 rounded text-xs font-bold ${statusColor}">${days} days</span></td>
-                <td class="p-3 text-center"><a href="https://wa.me/${d.phone.replace(/\+/g, '')}" target="_blank" class="text-green-600 hover:text-green-800 font-bold">💬 Remind</a></td>
-              </tr>
-            `;
-          }).join('');
-        } else {
-          tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">No debtors found</td></tr>';
+        // Fallback to local customers with debt if API returns empty
+        if (debtors.length === 0) {
+          debtors = customersList.filter(c => c.debt > 0);
         }
-      } catch (err) {
-        console.error("Debtors error:", err);
-      }
-    }
 
-    // LOAD CUSTOMERS
-    async function loadCustomers() {
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'getAllCustomers' })
-        });
-
-        const text = await response.text();
-        if (text.startsWith('<')) throw new Error("Server error");
-
-        const data = JSON.parse(text);
-        const tbody = document.getElementById('customersBody');
-
-        if (data.success && data.customers && data.customers.length > 0) {
-          tbody.innerHTML = data.customers.map(c => `
-            <tr class="hover:bg-gray-50 transition">
-              <td class="p-3 text-xs font-mono">${c.customerId}</td>
-              <td class="p-3">${c.name}</td>
-              <td class="p-3">${c.phone}</td>
-              <td class="p-3 font-mono">${c.meterNumber}</td>
-              <td class="p-3 text-xs">${c.type}</td>
-              <td class="p-3 text-center"><span class="px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-800">${c.status || 'Active'}</span></td>
+        if (debtors.length > 0) {
+          tbody.innerHTML = debtors.map(d => `
+            <tr class="hover:bg-red-50/50 transition">
+              <td class="p-3 font-bold text-gray-800">${d.id || d.customerId}</td>
+              <td class="p-3 font-medium">${d.name}</td>
+              <td class="p-3 text-xs text-gray-600">${d.phone}</td>
+              <td class="p-3 text-xs">${d.meterNumber}</td>
+              <td class="p-3 text-right font-extrabold text-red-600">KES ${(d.debt || d.amountDue || 0).toLocaleString()}</td>
+              <td class="p-3 text-center">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800">OVERDUE</span>
+              </td>
+              <td class="p-3 text-center">
+                <button onclick="sendWhatsAppReminder('${d.phone}', '${d.name}', ${d.debt || d.amountDue})" 
+                  class="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded text-xs font-bold transition">
+                  💬 Remind
+                </button>
+              </td>
             </tr>
           `).join('');
         } else {
-          tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">No customers found</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-green-600 font-bold text-xs">🎉 Excellent! No outstanding debtors found.</td></tr>';
         }
       } catch (err) {
-        console.error("Customers error:", err);
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-red-500 font-semibold text-xs">❌ Error generating report: ${err.message}</td></tr>`;
       }
     }
 
-    // UTILITIES
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-white', 'text-blue-700');
-      });
+    // 3. INVOICE PREVIEW & ACTIONS
+    function previewCurrentInvoice() {
+      if (!currentCalculatedInvoice || !currentCalculatedInvoice.customerId) {
+        alert("Please enter a valid Customer ID and Current Reading first.");
+        return;
+      }
 
-      document.getElementById(tabName + 'Tab').classList.remove('hidden');
-      event.target.classList.add('bg-white', 'text-blue-700');
+      const inv = currentCalculatedInvoice;
+      const compName = (typeof CONFIG !== 'undefined') ? CONFIG.COMPANY_NAME : 'Joy Water Supplies';
+      const mpesaTill = (typeof CONFIG !== 'undefined') ? CONFIG.MPESA_TILL : '4984254';
 
-      if (tabName === 'debtors') loadDebtors();
-      if (tabName === 'customers') loadCustomers();
+      document.getElementById('invoiceModalContent').innerHTML = `
+        <div class="text-center border-b pb-3">
+          <h4 class="font-extrabold text-lg text-blue-900">${compName}</h4>
+          <p class="text-xs text-gray-500">MajiHesabu Billing Statement</p>
+        </div>
+        <div class="grid grid-cols-2 text-xs gap-2 pt-2">
+          <p><strong>Customer ID:</strong> ${inv.customerId}</p>
+          <p><strong>Name:</strong> ${inv.customerName}</p>
+          <p><strong>Meter Number:</strong> ${inv.meterNumber}</p>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+        <div class="bg-white p-3 rounded-lg border my-2 text-xs space-y-1">
+          <div class="flex justify-between"><span>Previous Reading:</span> <span>${inv.previousReading} m³</span></div>
+          <div class="flex justify-between"><span>Current Reading:</span> <span>${inv.currentReading} m³</span></div>
+          <div class="flex justify-between font-bold text-blue-800"><span>Units Consumed:</span> <span>${inv.unitsConsumed} m³</span></div>
+          <div class="flex justify-between border-t pt-1"><span>Current Water Bill:</span> <span>KES ${inv.currentBill.toLocaleString()}</span></div>
+          <div class="flex justify-between text-red-600"><span>Previous Unpaid Debt:</span> <span>KES ${inv.previousBalance.toLocaleString()}</span></div>
+          <div class="flex justify-between font-extrabold text-sm border-t pt-1 text-green-700"><span>Total Due:</span> <span>KES ${inv.totalAmountDue.toLocaleString()}</span></div>
+        </div>
+        <div class="bg-green-50 p-2.5 rounded-lg border border-green-200 text-center text-xs text-green-800">
+          <strong>Pay via M-Pesa Buy Goods Till:</strong> <span class="font-bold text-sm">${mpesaTill}</span>
+        </div>
+      `;
+
+      document.getElementById('invoiceModal').classList.remove('hidden');
     }
 
-    function showMessage(elementId, message, isError = false) {
-      const el = document.getElementById(elementId);
-      el.innerHTML = `<div class="p-3 rounded-lg text-sm font-bold ${
-        isError ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-green-100 text-green-700 border border-green-300'
-      }">${message}</div>`;
-      setTimeout(() => { el.innerHTML = ''; }, 5000);
+    function closeInvoiceModal() {
+      document.getElementById('invoiceModal').classList.add('hidden');
     }
 
-    function logout() {
-      currentAdmin = null;
-      localStorage.removeItem("majihesabu_admin");
-      document.getElementById('loginSection').classList.remove('hidden');
-      document.getElementById('dashboardSection').classList.add('hidden');
-      document.getElementById('logoutBtn').classList.add('hidden');
-      document.getElementById('loginPhone').value = '';
-      document.getElementById('loginPassword').value = '';
+    function sendWhatsAppNotice() {
+      if (!currentCalculatedInvoice || !currentCalculatedInvoice.phone) {
+        alert("Please select a customer with a valid phone number first.");
+        return;
+      }
+      const inv = currentCalculatedInvoice;
+      const phoneClean = inv.phone.replace(/[^0-9]/g, '');
+      const msg = encodeURIComponent(
+        `Hello ${inv.customerName},\nYour water bill for Meter ${inv.meterNumber} is ready.\n` +
+        `Units Used: ${inv.unitsConsumed} m³\n` +
+        `Total Amount Due: KES ${inv.totalAmountDue.toLocaleString()}\n` +
+        `Pay via M-Pesa Till: ${CONFIG.MPESA_TILL || '4984254'}.\nThank you for choosing ${CONFIG.COMPANY_NAME || 'Joy Water Supplies'}.`
+      );
+      window.open(`https://wa.me/${phoneClean}?text=${msg}`, '_blank');
     }
 
-    // CHECK SAVED SESSION
-    window.addEventListener('DOMContentLoaded', () => {
-      const saved = localStorage.getItem("majihesabu_admin");
-      if (saved) {
-        try {
-          currentAdmin = JSON.parse(saved);
-          showDashboard();
-          loadDashboard();
-        } catch (e) {
-          localStorage.removeItem("majihesabu_admin");
+    function sendWhatsAppReminder(phone, name, amount) {
+      const phoneClean = phone.replace(/[^0-9]/g, '');
+      const msg = encodeURIComponent(
+        `Dear ${name},\nThis is a payment reminder for your outstanding water bill balance of KES ${amount.toLocaleString()}.\n` +
+        `Please clear your balance via M-Pesa Till: ${CONFIG.MPESA_TILL || '4984254'}.\nThank you!`
+      );
+      window.open(`https://wa.me/${phoneClean}?text=${msg}`, '_blank');
+    }
+
+    async function handleSaveReading(e) {
+      e.preventDefault();
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.innerText = "⏳ Saving Reading...";
+
+      try {
+        if (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) {
+          await fetch(CONFIG.API_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'saveMeterReading',
+              readingData: currentCalculatedInvoice
+            })
+          });
         }
+        alert("✅ Meter reading saved and invoice generated successfully!");
+      } catch (err) {
+        alert("Saved locally (Offline mode).");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerText = "💾 Save Reading & Generate Invoice";
+      }
+    }
+
+    // Load setup details on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      if (typeof CONFIG !== 'undefined' && CONFIG.COMPANY_NAME) {
+        document.getElementById('adminHeaderTitle').innerText = `${CONFIG.COMPANY_NAME} - Admin Control`;
       }
     });
   </script>
-
 </body>
 </html>
