@@ -755,6 +755,45 @@
       renderCustomerTable();
       updateDashboardMetrics();
     });
+
+    async function sendToBackend(actionType, dataPayload) {
+  const API_URL = "https://script.google.com/macros/s/AKfycbz7CC5O-txelyU2cQr7AdOykcACmBMckzwgIeffnBw-xpJ17A4dbRnahrBNy_atxtzG/exec";
+
+  const requestBody = {
+    action: actionType,
+    ...dataPayload
+  };
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      // text/plain prevents the browser from making a preflight OPTIONS request
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(requestBody)
+    });
+
+    const result = await response.json();
+    console.log("Response:", result);
+
+    if (!result.success) {
+      alert("Save failed: " + result.message);
+    } else {
+      alert("Saved successfully!");
+    }
+    return result;
+
+  } catch (err) {
+    console.error("Network or script error:", err);
+    alert("Connection error. Check browser console.");
+  }
+}
+
+// Example Call for recording meter reading
+sendToBackend("recordMeterReading", {
+  meterNumber: "MTR-102",
+  currentReading: 450,
+  readingDate: "2026-08-18"
+});
   </script>
 </body>
 </html>
