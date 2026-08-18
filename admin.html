@@ -794,6 +794,71 @@ sendToBackend("recordMeterReading", {
   currentReading: 450,
   readingDate: "2026-08-18"
 });
+    // Example: Meter Reading / Customer Form Submission
+async function handleFormSubmit(event) {
+  event.preventDefault();
+  
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.innerText = "⏳ Saving to Database...";
+
+  const payload = {
+    action: "createCustomer", // or "recordMeterReading", "recordPayment"
+    name: document.getElementById('custName').value,
+    phone: document.getElementById('custPhone').value,
+    meterNumber: document.getElementById('custMeter').value
+  };
+
+  try {
+    const response = await fetch(CONFIG.API_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    console.log("Backend Response:", result);
+
+    if (result.success) {
+      alert("✅ Saved successfully!");
+      
+      // CRITICAL: Re-fetch LIVE data from Google Sheets instead of loading local mock array
+      await loadLiveDashboardData(); 
+      
+    } else {
+      alert("⚠️ Database error: " + result.message);
+    }
+
+  } catch (error) {
+    console.error("❌ Submission failed:", error);
+    alert("⚠️ Failed to reach server. Check console for details.");
+    // DO NOT load mock data here!
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Submit";
+  }
+}
+
+// CRITICAL: Live Data Loader (Replaces Hardcoded Array)
+async function loadLiveDashboardData() {
+  try {
+    const response = await fetch(CONFIG.API_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: "getAllCustomers" }) // or "getDashboard"
+    });
+
+    const result = await response.json();
+
+    if (result.success && Array.isArray(result.data)) {
+      renderTableUI(result.data); // Render actual sheet data
+    } else {
+      console.warn("Could not fetch sheet data:", result.message);
+    }
+  } catch (err) {
+    console.error("Error loading live data:", err);
+  }
+}
   </script>
 </body>
 </html>
