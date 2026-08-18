@@ -858,6 +858,61 @@ async function loadLiveDashboardData() {
     console.error("Error loading live data:", err);
   }
 }
+    async function handleSaveReading(e) {
+  e.preventDefault();
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.disabled = true;
+  saveBtn.innerText = "⏳ Saving...";
+
+  // Ensure current invoice data is updated
+  calculateBilling();
+
+  if (!currentCalculatedInvoice || !currentCalculatedInvoice.customerId) {
+    alert("Please select a valid customer and enter a current reading.");
+    saveBtn.disabled = false;
+    saveBtn.innerText = "💾 Save Reading & Generate Invoice";
+    return;
+  }
+
+  const payload = {
+    action: "saveReading",
+    reading: currentCalculatedInvoice
+  };
+
+  try {
+    if (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) {
+      const res = await fetch(CONFIG.API_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+      const data = JSON.parse(await res.text());
+
+      if (data.success) {
+        alert(`✅ Reading saved successfully! Invoice: ${data.invoiceId}`);
+        
+        // Update local memory directory balance
+        const cust = customersList.find(c => c.id.toUpperCase() === currentCalculatedInvoice.customerId.toUpperCase());
+        if (cust) {
+          cust.previousReading = currentCalculatedInvoice.currentReading;
+          cust.debt = currentCalculatedInvoice.totalAmountDue;
+        }
+        
+        document.getElementById('readingForm').reset();
+        clearPopulatedFields();
+        renderCustomerTable();
+        updateDashboardMetrics();
+      } else {
+        alert(`⚠️ Backend Error: ${data.message}`);
+      }
+    }
+  } catch (err) {
+    alert(`❌ Save Failed: ${err.message}`);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerText = "💾 Save Reading & Generate Invoice";
+  }
+}
   </script>
 </body>
 </html>
